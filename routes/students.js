@@ -21,10 +21,19 @@ studentsRouter.post("/", async (req, res) => {
         res.status(500).json(err)
     }
 });
- 
+
+studentsRouter.get("/johns", async (req, res) => {
+    try {
+      const johns = await Student.find({ name: "John" });
+  
+      res.json(johns);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
+
 studentsRouter.put("/", async (req, res) => {
     try {
-      // Update all entries with name equal to "John" to "Bob"
       const updateResult = await Student.updateMany(
         { name: "John" },
         { $set: { name: "Bob" } }
@@ -32,10 +41,28 @@ studentsRouter.put("/", async (req, res) => {
   
       // Check if any documents were updated
       if (updateResult.nModified > 0) {
+
         res.json({ message: "Updated successfully" });
       } else {
         res.json({ message: "No documents matched the criteria" });
       }
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
+  
+  studentsRouter.delete("/:id", async (req, res) => {
+    try {
+      const studentId = req.params.id;
+      const student = await Student.findById(studentId);
+  
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+  
+     
+      await Student.findByIdAndDelete(studentId);
+      res.json({ message: "Student deleted successfully" });
     } catch (err) {
       res.status(500).json(err);
     }
